@@ -1,0 +1,1973 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JavaLaunch — Career Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #07090f;
+  --surface: #0e1421;
+  --surface2: #141e30;
+  --border: #1c2a40;
+  --accent: #00d4ff;
+  --accent2: #7c3aed;
+  --accent3: #f59e0b;
+  --green: #10b981;
+  --red: #ef4444;
+  --text: #e2e8f0;
+  --muted: #64748b;
+  --card: #101828;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    linear-gradient(rgba(0,212,255,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,212,255,0.025) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none; z-index: 0;
+}
+
+/* ─── LAYOUT ─────────────────────────────────────────── */
+
+.app { display: flex; min-height: 100vh; position: relative; z-index: 1; }
+
+/* Sidebar */
+.sidebar {
+  width: 240px; min-height: 100vh;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  position: fixed; left: 0; top: 0;
+  z-index: 100;
+  transition: transform .3s ease;
+}
+
+.sidebar-logo {
+  padding: 28px 24px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebar-logo .brand {
+  font-family: 'Syne', sans-serif;
+  font-size: 22px; font-weight: 800;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.sidebar-logo .tagline {
+  font-size: 11px; color: var(--muted);
+  font-family: 'Space Mono', monospace;
+  margin-top: 4px;
+}
+
+.sidebar-nav { flex: 1; padding: 16px 12px; }
+
+.nav-section-label {
+  font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 1.5px;
+  color: var(--muted); padding: 12px 12px 6px;
+}
+
+.nav-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 14px; border-radius: 10px;
+  cursor: pointer; transition: all .2s;
+  font-size: 14px; font-weight: 500;
+  color: var(--muted); margin-bottom: 2px;
+  user-select: none;
+}
+
+.nav-item:hover { background: var(--surface2); color: var(--text); }
+
+.nav-item.active {
+  background: linear-gradient(135deg, rgba(0,212,255,0.15), rgba(124,58,237,0.1));
+  color: var(--accent);
+  border: 1px solid rgba(0,212,255,0.2);
+}
+
+.nav-item .icon { font-size: 18px; flex-shrink: 0; }
+.nav-item .badge {
+  margin-left: auto; background: var(--accent2);
+  color: white; font-size: 10px; padding: 2px 7px;
+  border-radius: 20px; font-weight: 700;
+}
+
+.sidebar-bottom {
+  padding: 16px 12px;
+  border-top: 1px solid var(--border);
+}
+
+.user-info {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border-radius: 10px;
+  background: var(--surface2);
+}
+
+.avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700; color: white; flex-shrink: 0;
+}
+
+.user-name { font-size: 13px; font-weight: 600; }
+.user-role { font-size: 11px; color: var(--muted); }
+
+/* Main */
+.main {
+  flex: 1; margin-left: 240px; min-width: 0; overflow-x: hidden;
+  min-height: 100vh;
+}
+
+.topbar {
+  position: sticky; top: 0;
+  background: rgba(7,9,15,0.9);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 24px;
+  display: flex; align-items: center; gap: 16px;
+  z-index: 50;
+}
+
+.topbar-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 18px; font-weight: 700; flex: 1;
+}
+
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 9px 18px; border-radius: 8px;
+  font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: all .2s;
+  border: none; font-family: inherit;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), #0099cc);
+  color: #000; box-shadow: 0 0 20px rgba(0,212,255,0.25);
+}
+
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 0 30px rgba(0,212,255,0.4); }
+
+.btn-outline {
+  background: transparent; color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+
+.btn-ghost {
+  background: transparent; color: var(--muted);
+  padding: 9px 12px;
+}
+
+.btn-ghost:hover { color: var(--accent); }
+
+.btn-green { background: var(--green); color: white; }
+.btn-purple { background: var(--accent2); color: white; }
+
+.btn-sm { padding: 6px 12px; font-size: 12px; }
+
+.page-content { padding: 24px; animation: fadeIn .3s ease; overflow-x: hidden; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ─── AUTH MODAL ─────────────────────────────────────── */
+
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.75);
+  backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000;
+  opacity: 0; pointer-events: none;
+  transition: opacity .3s;
+}
+
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 40px;
+  width: 420px; max-width: 95vw;
+  transform: scale(0.95);
+  transition: transform .3s;
+}
+
+.modal-overlay.open .modal { transform: scale(1); }
+
+.modal-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 24px; font-weight: 800;
+  margin-bottom: 8px;
+}
+
+.modal-sub { color: var(--muted); font-size: 14px; margin-bottom: 28px; }
+
+.form-group { margin-bottom: 18px; }
+
+.form-label {
+  display: block; font-size: 12px;
+  font-weight: 600; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+
+.form-input {
+  width: 100%; padding: 12px 16px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text); font-size: 14px;
+  font-family: inherit;
+  transition: border-color .2s, box-shadow .2s;
+  outline: none;
+}
+
+.form-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(0,212,255,0.1);
+}
+
+.form-toggle {
+  text-align: center; margin-top: 20px;
+  font-size: 13px; color: var(--muted);
+}
+
+.form-toggle a { color: var(--accent); cursor: pointer; text-decoration: underline; }
+
+.error-msg {
+  background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3);
+  color: var(--red); padding: 10px 14px; border-radius: 8px;
+  font-size: 13px; margin-bottom: 16px;
+}
+
+/* ─── STATS CARDS ────────────────────────────────────── */
+
+.stats-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 14px; margin-bottom: 24px;
+}
+
+.stat-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px 24px;
+  position: relative; overflow: hidden;
+  transition: border-color .2s, transform .2s;
+}
+
+.stat-card:hover { transform: translateY(-2px); border-color: var(--accent); }
+
+.stat-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+}
+
+.stat-card.blue::before { background: linear-gradient(90deg, var(--accent), transparent); }
+.stat-card.purple::before { background: linear-gradient(90deg, var(--accent2), transparent); }
+.stat-card.green::before { background: linear-gradient(90deg, var(--green), transparent); }
+.stat-card.amber::before { background: linear-gradient(90deg, var(--accent3), transparent); }
+
+.stat-label { font-size: 12px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+.stat-value { font-family: 'Space Mono', monospace; font-size: 32px; font-weight: 700; margin: 8px 0 4px; }
+.stat-card.blue .stat-value { color: var(--accent); }
+.stat-card.purple .stat-value { color: #a78bfa; }
+.stat-card.green .stat-value { color: var(--green); }
+.stat-card.amber .stat-value { color: var(--accent3); }
+.stat-sub { font-size: 12px; color: var(--muted); }
+
+/* ─── FILTERS ────────────────────────────────────────── */
+
+.filter-bar {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px;
+  align-items: end;
+  margin-bottom: 24px;
+}
+
+.filter-group { display: flex; flex-direction: column; gap: 6px; }
+
+.filter-label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+
+.filter-select, .filter-input {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text); font-family: inherit;
+  font-size: 13px; padding: 9px 14px;
+  outline: none; cursor: pointer;
+  transition: border-color .2s;
+  width: 100%;
+}
+
+.filter-select:focus, .filter-input:focus {
+  border-color: var(--accent);
+}
+
+.filter-input { width: 100%; }
+
+/* ─── JOB CARDS ──────────────────────────────────────── */
+
+.jobs-grid { display: flex; flex-direction: column; gap: 14px; }
+
+.job-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px; padding: 20px;
+  display: flex; gap: 16px;
+  flex-wrap: wrap;
+  transition: border-color .25s, transform .2s, box-shadow .2s;
+  animation: slideUp .3s ease both;
+}
+
+@keyframes slideUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+.job-card:hover {
+  border-color: rgba(0,212,255,0.35);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(0,212,255,0.08);
+}
+
+.job-logo {
+  width: 52px; height: 52px; border-radius: 12px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; flex-shrink: 0;
+}
+
+.job-body { flex: 1; min-width: 0; }
+
+.job-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 6px; }
+
+.job-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 16px; font-weight: 700;
+}
+
+.job-company { font-size: 13px; color: var(--muted); margin-bottom: 10px; }
+
+.job-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+
+.tag {
+  font-size: 11px; font-weight: 600; padding: 4px 10px;
+  border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px;
+}
+
+.tag-mnc    { background: rgba(0,212,255,0.1);   color: var(--accent);  border: 1px solid rgba(0,212,255,0.2); }
+.tag-startup{ background: rgba(124,58,237,0.1);  color: #a78bfa;        border: 1px solid rgba(124,58,237,0.2); }
+.tag-fintech{ background: rgba(245,158,11,0.1);  color: var(--accent3); border: 1px solid rgba(245,158,11,0.2); }
+.tag-banking{ background: rgba(16,185,129,0.1);  color: var(--green);   border: 1px solid rgba(16,185,129,0.2); }
+.tag-midsize{ background: rgba(239,68,68,0.1);   color: #f87171;        border: 1px solid rgba(239,68,68,0.2); }
+.tag-job    { background: rgba(0,212,255,0.07);  color: var(--accent);  border: 1px solid rgba(0,212,255,0.15); }
+.tag-intern { background: rgba(245,158,11,0.07); color: var(--accent3); border: 1px solid rgba(245,158,11,0.15); }
+.tag-skill  { background: var(--surface2);       color: var(--muted);   border: 1px solid var(--border); }
+
+.job-meta {
+  display: flex; gap: 16px; flex-wrap: wrap;
+  font-size: 12px; color: var(--muted);
+}
+
+.job-meta span { display: flex; align-items: center; gap: 5px; }
+
+.job-actions {
+  display: flex; flex-direction: row; gap: 8px;
+  align-items: center; justify-content: flex-end;
+  width: 100%; margin-top: 8px; flex-wrap: wrap;
+}
+
+.salary-badge {
+  background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(16,185,129,0.05));
+  border: 1px solid rgba(16,185,129,0.25);
+  color: var(--green); font-size: 12px; font-weight: 700;
+  padding: 5px 10px; border-radius: 8px;
+  font-family: 'Space Mono', monospace;
+  white-space: nowrap;
+}
+
+.save-btn {
+  background: none; border: 1px solid var(--border);
+  color: var(--muted); border-radius: 8px;
+  padding: 7px 10px; cursor: pointer;
+  transition: all .2s; font-size: 16px;
+}
+
+.save-btn:hover, .save-btn.saved { border-color: var(--accent3); color: var(--accent3); background: rgba(245,158,11,0.1); }
+
+/* ─── COURSES ────────────────────────────────────────── */
+
+.tech-section { margin-bottom: 32px; }
+
+.tech-header {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 16px;
+}
+
+.tech-icon { font-size: 24px; }
+
+.tech-name {
+  font-family: 'Syne', sans-serif;
+  font-size: 18px; font-weight: 700;
+}
+
+.tech-count {
+  background: var(--surface2); border: 1px solid var(--border);
+  color: var(--muted); font-size: 11px; font-weight: 700;
+  padding: 3px 10px; border-radius: 20px;
+  font-family: 'Space Mono', monospace;
+}
+
+.courses-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 14px;
+}
+
+.course-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px; padding: 20px;
+  transition: border-color .2s, transform .2s;
+  display: flex; flex-direction: column;
+  animation: slideUp .3s ease both;
+}
+
+.course-card:hover { border-color: rgba(124,58,237,0.4); transform: translateY(-2px); }
+
+.course-platform {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 1.5px; margin-bottom: 8px;
+}
+
+.platform-youtube { color: #ff4444; }
+.platform-udemy { color: #a435f0; }
+.platform-nptel { color: var(--accent3); }
+.platform-official { color: var(--accent); }
+.platform-other { color: var(--green); }
+
+.course-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 14px; font-weight: 700;
+  line-height: 1.4; margin-bottom: 8px; flex: 1;
+}
+
+.course-instructor { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+
+.course-meta { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+
+.course-tag {
+  font-size: 10px; padding: 3px 9px; border-radius: 5px;
+  font-weight: 600; border: 1px solid;
+}
+
+.course-tag.beginner { color: var(--green); border-color: rgba(16,185,129,0.3); background: rgba(16,185,129,0.08); }
+.course-tag.intermediate { color: var(--accent3); border-color: rgba(245,158,11,0.3); background: rgba(245,158,11,0.08); }
+.course-tag.advanced { color: #f87171; border-color: rgba(239,68,68,0.3); background: rgba(239,68,68,0.08); }
+.course-tag.duration { color: var(--muted); border-color: var(--border); background: var(--surface2); }
+
+/* ─── RESUME TAILOR ──────────────────────────────────── */
+
+.resume-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.panel {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 16px; overflow: hidden;
+}
+
+.panel-header {
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+
+.panel-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 15px; font-weight: 700;
+  display: flex; align-items: center; gap: 10px;
+}
+
+.panel-body { padding: 20px 24px; }
+
+.textarea {
+  width: 100%; padding: 14px 16px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text); font-size: 13px;
+  font-family: 'Space Mono', monospace;
+  line-height: 1.6; resize: vertical;
+  outline: none; transition: border-color .2s;
+}
+
+.textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,212,255,0.1); }
+
+.ai-result {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  font-size: 13px; line-height: 1.7;
+  font-family: 'Space Mono', monospace;
+  white-space: pre-wrap;
+  max-height: 500px; overflow-y: auto;
+  color: #a5f3fc;
+}
+
+.tips-box {
+  background: rgba(124,58,237,0.08);
+  border: 1px solid rgba(124,58,237,0.2);
+  border-radius: 10px;
+  padding: 16px;
+  font-size: 13px; line-height: 1.7;
+  color: #c4b5fd;
+  margin-top: 14px;
+  white-space: pre-wrap;
+}
+
+.ai-loader {
+  display: flex; align-items: center; justify-content: center;
+  gap: 12px; padding: 40px;
+  color: var(--muted); font-size: 14px;
+}
+
+.spinner {
+  width: 24px; height: 24px; border-radius: 50%;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ─── EMPTY & LOADING ────────────────────────────────── */
+
+.empty-state {
+  text-align: center; padding: 60px 20px;
+  color: var(--muted);
+}
+
+.empty-state .icon { font-size: 48px; margin-bottom: 16px; }
+.empty-state h3 { font-size: 18px; color: var(--text); margin-bottom: 8px; }
+.empty-state p { font-size: 14px; }
+
+.loading-grid { display: flex; flex-direction: column; gap: 14px; }
+
+.skeleton {
+  background: linear-gradient(90deg, var(--surface2) 25%, var(--surface) 50%, var(--surface2) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+}
+
+@keyframes shimmer { to { background-position: -200% 0; } }
+
+.skeleton-card {
+  height: 110px; border-radius: 16px;
+}
+
+/* ─── TOAST ──────────────────────────────────────────── */
+
+.toast-container {
+  position: fixed; bottom: 24px; right: 24px;
+  z-index: 9999; display: flex; flex-direction: column; gap: 8px;
+}
+
+.toast {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px; padding: 12px 18px;
+  font-size: 13px; font-weight: 500;
+  display: flex; align-items: center; gap: 10px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  animation: toastIn .3s ease;
+}
+
+@keyframes toastIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+
+.toast.success { border-color: rgba(16,185,129,0.4); }
+.toast.error   { border-color: rgba(239,68,68,0.4); }
+
+/* ─── PILLS / CHIPS ──────────────────────────────────── */
+
+.pill-group { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+
+.pill {
+  padding: 7px 16px; border-radius: 20px;
+  font-size: 12px; font-weight: 600; cursor: pointer;
+  border: 1px solid var(--border); color: var(--muted);
+  transition: all .2s; background: var(--surface2);
+}
+
+.pill:hover { border-color: var(--accent); color: var(--accent); }
+
+.pill.active {
+  background: linear-gradient(135deg, var(--accent), #0099cc);
+  color: #000; border-color: transparent;
+}
+
+/* ─── SECTION HEADER ─────────────────────────────────── */
+
+.section-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.section-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 22px; font-weight: 800;
+}
+
+.section-sub { font-size: 13px; color: var(--muted); margin-top: 3px; }
+
+/* ─── HISTORY LIST ───────────────────────────────────── */
+
+.history-item {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 16px 20px;
+  margin-bottom: 10px; cursor: pointer;
+  transition: border-color .2s;
+}
+
+.history-item:hover { border-color: rgba(124,58,237,0.4); }
+
+.history-job { font-weight: 600; font-size: 14px; }
+.history-company { font-size: 12px; color: var(--muted); }
+.history-date { font-size: 11px; color: var(--muted); font-family: 'Space Mono', monospace; }
+
+/* ─── RESPONSIVE ─────────────────────────────────────── */
+
+@media (max-width: 1100px) {
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .resume-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 768px) {
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.open { transform: translateX(0); }
+  .main { margin-left: 0; }
+  .page-content { padding: 20px; }
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+  .topbar { padding: 14px 20px; }
+}
+
+/* ─── COPY BUTTON ────────────────────────────────────── */
+
+.copy-btn {
+  background: var(--surface2); border: 1px solid var(--border);
+  color: var(--muted); border-radius: 6px;
+  padding: 5px 10px; cursor: pointer;
+  font-size: 12px; transition: all .2s;
+}
+
+.copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ─── COURSE NEW HIGHLIGHT ─────────────────── */
+.course-new {
+  border-color: rgba(16,185,129,0.4) !important;
+  box-shadow: 0 0 0 1px rgba(16,185,129,0.15), 0 4px 20px rgba(16,185,129,0.08);
+}
+.course-new::before {
+  background: linear-gradient(90deg, var(--green), transparent) !important;
+}
+
+/* ─── TIME PILLS ────────────────────────────── */
+.time-pill {
+  padding: 7px 14px; border-radius: 20px;
+  font-size: 12px; font-weight: 700; cursor: pointer;
+  border: 1px solid var(--border); color: var(--muted);
+  background: var(--surface2); transition: all .2s;
+  font-family: inherit; white-space: nowrap;
+}
+.time-pill:hover { border-color: var(--accent); color: var(--accent); }
+.time-pill.active {
+  background: linear-gradient(135deg, var(--accent), #0099cc);
+  color: #000; border-color: transparent;
+}
+.time-pill.active.purple {
+  background: linear-gradient(135deg, var(--accent2), #5b21b6);
+  color: #fff;
+}
+
+/* ─── POSTED TIME BADGE ─────────────────────── */
+.time-ago-badge {
+  font-size: 10px; font-weight: 700; padding: 3px 8px;
+  border-radius: 6px; font-family: 'Space Mono', monospace;
+  white-space: nowrap;
+}
+.time-ago-fresh {
+  background: rgba(16,185,129,0.12);
+  color: var(--green); border: 1px solid rgba(16,185,129,0.25);
+}
+.time-ago-recent {
+  background: rgba(0,212,255,0.08);
+  color: var(--accent); border: 1px solid rgba(0,212,255,0.2);
+}
+.time-ago-old {
+  background: var(--surface2); color: var(--muted);
+  border: 1px solid var(--border);
+}
+
+/* ─── PULSE ANIMATION ───────────────────────── */
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.5; transform: scale(0.85); }
+}
+
+/* scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+</style>
+</head>
+<body>
+
+<!-- AUTH MODAL -->
+<div class="modal-overlay" id="authModal">
+  <div class="modal">
+    <div id="loginForm">
+      <div class="modal-title">Welcome Back</div>
+      <div class="modal-sub">Sign in to save jobs & tailor your resume</div>
+      <div id="authError" class="error-msg" style="display:none"></div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input class="form-input" type="email" id="loginEmail" placeholder="you@example.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-input" type="password" id="loginPassword" placeholder="••••••••">
+      </div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="doLogin()">Sign In →</button>
+      <div class="form-toggle">Don't have an account? <a onclick="toggleAuthForm()">Register</a></div>
+    </div>
+    <div id="registerForm" style="display:none">
+      <div class="modal-title">Create Account</div>
+      <div class="modal-sub">Start your Java developer journey</div>
+      <div id="authError2" class="error-msg" style="display:none"></div>
+      <div class="form-group">
+        <label class="form-label">Full Name</label>
+        <input class="form-input" type="text" id="regName" placeholder="Rahul Sharma">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input class="form-input" type="email" id="regEmail" placeholder="you@example.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-input" type="password" id="regPassword" placeholder="Min 6 characters">
+      </div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="doRegister()">Create Account →</button>
+      <div class="form-toggle">Already have an account? <a onclick="toggleAuthForm()">Sign In</a></div>
+    </div>
+    <button onclick="closeAuth()" style="position:absolute;top:16px;right:16px;background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer">✕</button>
+  </div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- APP -->
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="brand">JavaGo</div>
+      <div class="tagline"> Your Java career in a GO!</div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Dashboard</div>
+      <div class="nav-item active" onclick="switchPage('jobs')" id="nav-jobs">
+        <span class="icon"></span> Job Opportunities
+        <span class="badge" id="jobCount">22</span>
+      </div>
+      <div class="nav-item" onclick="switchPage('courses')" id="nav-courses">
+        <span class="icon"></span> Free Courses
+        <span class="badge" id="courseCount">26</span>
+      </div>
+      <div class="nav-item" onclick="switchPage('resume')" id="nav-resume">
+        <span class="icon"></span> AI Resume Tailor
+      </div>
+      <div class="nav-section-label">My Space</div>
+      <div class="nav-item" onclick="switchPage('saved')" id="nav-saved">
+        <span class="icon"></span> Saved Jobs
+      </div>
+      <div class="nav-item" onclick="switchPage('history')" id="nav-history">
+        <span class="icon"></span> Resume History
+      </div>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="user-info" id="userInfo">
+        <div class="avatar" id="userAvatar">?</div>
+        <div>
+          <div class="user-name" id="userName">Guest User</div>
+          <div class="user-role" id="userRoleLabel">Not logged in</div>
+        </div>
+      </div>
+      <div style="margin-top:10px;display:flex;gap:8px">
+        <button class="btn btn-outline btn-sm" style="flex:1;justify-content:center" id="authBtn" onclick="openAuth()">Sign In</button>
+        <button class="btn btn-ghost btn-sm" id="logoutBtn" onclick="doLogout()" style="display:none">Logout</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-title" id="topbarTitle">Job Opportunities</div>
+      <div style="display:flex;gap:8px;align-items:center" id="topbarActions"></div>
+    </div>
+
+    <!-- PAGE: JOBS -->
+    <div class="page-content" id="page-jobs">
+
+      <!-- JOB SYNC STATUS BANNER -->
+      <div id="jobSyncBanner" style="display:flex;align-items:center;gap:12px;
+        background:linear-gradient(90deg,rgba(0,212,255,0.07),rgba(0,212,255,0.02));
+        border:1px solid rgba(0,212,255,0.2);border-radius:12px;
+        padding:12px 20px;margin-bottom:20px;font-size:13px;">
+        <span id="jobSyncDot" style="width:8px;height:8px;border-radius:50%;
+          background:var(--muted);flex-shrink:0"></span>
+        <span id="jobSyncText" style="color:var(--muted)">Loading job sync status…</span>
+        <span style="margin-left:auto;display:flex;gap:8px;align-items:center">
+          <span id="jobSyncBadge" style="display:none;background:rgba(16,185,129,0.15);
+            color:var(--green);border:1px solid rgba(16,185,129,0.3);
+            border-radius:20px;padding:2px 10px;font-size:11px;font-weight:700">LIVE</span>
+          <button class="btn btn-outline btn-sm" id="jobSyncBtn" onclick="syncJobsNow()">
+            Sync Jobs Now
+          </button>
+        </span>
+      </div>
+
+      <!-- STATS ROW -->
+      <div class="stats-grid">
+        <div class="stat-card blue">
+          <div class="stat-label">Total Jobs</div>
+          <div class="stat-value" id="stat-total">—</div>
+          <div class="stat-sub" id="stat-total-sub">All sources</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-label">Live Jobs</div>
+          <div class="stat-value" id="stat-live">—</div>
+          <div class="stat-sub">From 6 platforms</div>
+        </div>
+        <div class="stat-card purple">
+          <div class="stat-label">New Today</div>
+          <div class="stat-value" id="stat-24h">—</div>
+          <div class="stat-sub">Last 24 hours</div>
+        </div>
+        <div class="stat-card amber">
+          <div class="stat-label">Fresher / Remote</div>
+          <div class="stat-value" id="stat-fresher">—</div>
+          <div class="stat-sub" id="stat-remote-sub">Entry level</div>
+        </div>
+      </div>
+
+      <!-- LIVE REFRESH BANNER -->
+      <div id="refreshBanner" style="display:none;
+        background:linear-gradient(90deg,rgba(16,185,129,0.12),rgba(16,185,129,0.04));
+        border:1px solid rgba(16,185,129,0.3); border-radius:12px;
+        padding:12px 20px; margin-bottom:20px;
+        align-items:center; gap:12px; font-size:13px; color:var(--green);">
+        <span style="width:8px;height:8px;border-radius:50%;background:var(--green);
+          box-shadow:0 0 8px var(--green);animation:pulse 1.5s infinite;flex-shrink:0"></span>
+        <span id="refreshBannerText">Jobs refreshed live</span>
+        <span style="margin-left:auto;color:var(--muted);font-family:Space Mono,monospace;font-size:11px" id="refreshBannerTime"></span>
+      </div>
+
+      <!-- FILTER BAR -->
+      <div class="filter-bar">
+        <div class="filter-group">
+          <div class="filter-label">Search</div>
+          <input class="filter-input" type="text" id="searchKeyword" placeholder="  java, spring boot..." value="java">
+        </div>
+        <div class="filter-group">
+          <div class="filter-label">Location</div>
+          <input class="filter-input" type="text" id="searchLocation" placeholder="  city or blank for all" value="">
+        </div>
+        <div class="filter-group">
+          <div class="filter-label">Company Type</div>
+          <select class="filter-select" id="filterCompany">
+            <option value="">All Companies</option>
+            <option value="MNC">MNC</option>
+            <option value="STARTUP">Startup</option>
+            <option value="MIDSIZE">Midsize</option>
+            <option value="FINTECH">Fintech</option>
+            <option value="BANKING">Banking</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <div class="filter-label">Job Type</div>
+          <select class="filter-select" id="filterType">
+            <option value="">All Types</option>
+            <option value="JOB">Full-time</option>
+            <option value="INTERNSHIP">Internship</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <div class="filter-label">Source</div>
+          <select class="filter-select" id="filterSource" onchange="loadJobs()">
+            <option value="">All Sources</option>
+            <option value="LIVE">Live</option>
+            <option value="MANUAL">Curated</option>
+            <option value="REMOTE">Remote</option>
+            <option value="FRESHER">Fresher</option>
+            <option value="NEW">New Today</option>
+          </select>
+        </div>
+        <div class="filter-group" style="grid-column: 1 / -1">
+          <div class="filter-label">Time Range &amp; Actions</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+            <button class="time-pill active" id="tpAll"  onclick="setTimeFilter(this,'')">All</button>
+            <button class="time-pill" id="tp24H" onclick="setTimeFilter(this,'24H')">24H</button>
+            <button class="time-pill" id="tp7W"  onclick="setTimeFilter(this,'7W')">7 Weeks</button>
+            <div style="margin-left:auto;display:flex;gap:8px">
+              <button class="btn btn-primary" id="searchBtn" onclick="loadJobs()">Search</button>
+              <button class="btn btn-outline" onclick="resetFilters()">↺ Reset</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION HEADER -->
+      <div class="section-header">
+        <div>
+          <div class="section-title">Java Developer Roles</div>
+          <div class="section-sub" id="jobResultSub">Loading opportunities…</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span id="liveIndicator" style="display:none;align-items:center;gap:6px;font-size:12px;color:var(--green);font-weight:600">
+            <span style="width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 1.5s infinite;display:inline-block"></span>
+            LIVE
+          </span>
+          <button class="btn btn-outline btn-sm" onclick="loadJobs()" title="Refresh now">↻ Refresh</button>
+        </div>
+      </div>
+
+      <div class="jobs-grid" id="jobsList"></div>
+    </div>
+
+    <!-- PAGE: COURSES -->
+    <div class="page-content" id="page-courses" style="display:none">
+
+      <!-- SYNC STATUS BANNER -->
+      <div id="syncStatusBanner" style="
+        border-radius:14px; padding:14px 20px; margin-bottom:20px;
+        display:flex; align-items:center; gap:14px; font-size:13px;
+        background:linear-gradient(90deg,rgba(16,185,129,0.1),rgba(16,185,129,0.03));
+        border:1px solid rgba(16,185,129,0.25);">
+        <span id="syncDot" style="width:9px;height:9px;border-radius:50%;background:var(--muted);flex-shrink:0"></span>
+        <div style="flex:1">
+          <span id="syncStatusText" style="color:var(--muted)">Loading sync status...</span>
+          <span id="syncLastTime" style="color:var(--muted);margin-left:12px;font-size:11px;font-family:Space Mono,monospace"></span>
+        </div>
+        <div style="display:flex;gap:8px;flex-shrink:0">
+          <span id="syncCountBadge" style="display:none;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;background:rgba(16,185,129,0.15);color:var(--green);border:1px solid rgba(16,185,129,0.3)"></span>
+          <button class="btn btn-outline btn-sm" id="syncNowBtn" onclick="syncNow()" title="Fetch new courses from YouTube now">
+            Sync Now
+          </button>
+        </div>
+      </div>
+
+      <!-- STATS ROW -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px">
+        <div class="stat-card blue">
+          <div class="stat-label">Total Courses</div>
+          <div class="stat-value" id="stat-courses-total">—</div>
+          <div class="stat-sub">All technologies</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-label">Auto-Fetched</div>
+          <div class="stat-value" id="stat-courses-auto">—</div>
+          <div class="stat-sub">Live from YouTube</div>
+        </div>
+        <div class="stat-card amber">
+          <div class="stat-label">New (48h)</div>
+          <div class="stat-value" id="stat-courses-new">—</div>
+          <div class="stat-sub">Recently added</div>
+        </div>
+      </div>
+
+      <div class="section-header">
+        <div>
+          <div class="section-title">Free Java Developer Courses</div>
+          <div class="section-sub" id="courseResultSub">Curated free resources to master the entire Java stack</div>
+        </div>
+        <span id="courseLiveIndicator" style="display:none;align-items:center;gap:6px;font-size:12px;color:var(--green);font-weight:600">
+          <span style="width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 1.5s infinite;display:inline-block"></span>
+          LIVE SYNC ON
+        </span>
+      </div>
+
+      <div class="filter-bar" style="margin-bottom:24px">
+        <div class="filter-group">
+          <div class="filter-label">Search Courses</div>
+          <input class="filter-input" type="text" id="courseSearch" placeholder="  spring, aws, git..." oninput="filterCoursesUI()">
+        </div>
+        <div class="filter-group">
+          <div class="filter-label">Category</div>
+          <select class="filter-select" id="courseCategory" onchange="filterCoursesUI()">
+            <option value="">All Categories</option>
+            <option value="core">Core Java</option>
+            <option value="advanced">Advanced Java</option>
+            <option value="spring">Spring Boot</option>
+            <option value="spring ai">Spring AI</option>
+            <option value="sql">SQL</option>
+            <option value="git">Git &amp; GitHub</option>
+            <option value="aws">AWS</option>
+            <option value="dsa">DSA</option>
+            <option value="microservices">Microservices</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <div class="filter-label">Source</div>
+          <select class="filter-select" id="courseSource" onchange="filterCoursesUI()" style="min-width:150px">
+            <option value="">All Sources</option>
+            <option value="youtube">▶ YouTube</option>
+            <option value="udemy">◉ Udemy</option>
+            <option value="github">⌥ GitHub</option>
+            <option value="manual">Curated</option>
+            <option value="new">New (48h)</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="coursesContainer"></div>
+    </div>
+
+    <!-- PAGE: RESUME TAILOR -->
+    <div class="page-content" id="page-resume" style="display:none">
+      <div class="section-header">
+        <div>
+          <div class="section-title">AI Resume Tailor</div>
+          <div class="section-sub">Powered by Mistral-7B (free via OpenRouter) — tailor your resume to any JD</div>
+        </div>
+      </div>
+
+      <div class="resume-grid">
+        <!-- LEFT: INPUT -->
+        <div>
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title">Your Resume</div>
+              <button class="btn btn-outline btn-sm" onclick="loadSavedResume()">Load Saved</button>
+            </div>
+            <div class="panel-body">
+              <textarea class="textarea" id="resumeInput" rows="12" placeholder="Paste your resume here...
+
+OBJECTIVE
+Aspiring Java Developer...
+
+EDUCATION
+B.E Computer Engineering, ...
+
+SKILLS
+Java, Spring Boot, SQL, Git...
+
+PROJECTS
+1. Library Management System - Java, MySQL...
+
+INTERNSHIP
+..."></textarea>
+              <div style="margin-top:10px;display:flex;gap:8px">
+                <button class="btn btn-outline btn-sm" onclick="saveBaseResume()">Save Resume</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel" style="margin-top:16px">
+            <div class="panel-header">
+              <div class="panel-title">Job Details</div>
+            </div>
+            <div class="panel-body">
+              <div class="form-group">
+                <label class="form-label">Job Title</label>
+                <input class="form-input" type="text" id="jdTitle" placeholder="Java Developer - Fresher">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Company Name</label>
+                <input class="form-input" type="text" id="jdCompany" placeholder="Razorpay">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Job Description</label>
+                <textarea class="textarea" id="jdInput" rows="8" placeholder="Paste the job description here...
+
+We are looking for a Java Developer...
+Requirements:
+- Strong Java fundamentals
+- Spring Boot experience
+..."></textarea>
+              </div>
+              <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="tailorResume()">
+                Tailor My Resume with AI
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: OUTPUT -->
+        <div>
+          <div class="panel" style="position:sticky;top:80px">
+            <div class="panel-header">
+              <div class="panel-title">Tailored Resume</div>
+              <button class="copy-btn" onclick="copyResult()" id="copyResultBtn" style="display:none">Copy</button>
+            </div>
+            <div class="panel-body">
+              <div id="resumeResult">
+                <div class="empty-state">
+                  <div class="icon"></div>
+                  <h3>AI Ready</h3>
+                  <p>Paste your resume + job description<br>and hit "Tailor My Resume"</p>
+                </div>
+              </div>
+              <div id="tipsResult" style="display:none"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: SAVED JOBS -->
+    <div class="page-content" id="page-saved" style="display:none">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Saved Jobs</div>
+          <div class="section-sub">Jobs you've bookmarked</div>
+        </div>
+      </div>
+      <div class="jobs-grid" id="savedJobsList"></div>
+    </div>
+
+    <!-- PAGE: HISTORY -->
+    <div class="page-content" id="page-history" style="display:none">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Resume History</div>
+          <div class="section-sub">Your AI-tailored resumes</div>
+        </div>
+      </div>
+      <div id="historyList"></div>
+      <div id="historyDetail" style="display:none;margin-top:20px">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title" id="historyDetailTitle">Tailored Resume</div>
+            <div style="display:flex;gap:8px">
+              <button class="copy-btn" onclick="copyHistoryResult()">Copy</button>
+              <button class="btn btn-ghost btn-sm" onclick="hideHistoryDetail()">✕ Close</button>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="ai-result" id="historyDetailContent"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════════
+//  CONFIG — point to your Spring Boot backend
+// ════════════════════════════════════════════════════════════
+const API = 'http://localhost:8080/api';
+
+// ════════════════════════════════════════════════════════════
+//  STATE
+// ════════════════════════════════════════════════════════════
+let token = localStorage.getItem('jl_token') || null;
+let currentUser = JSON.parse(localStorage.getItem('jl_user') || 'null');
+let allJobs = [];
+let allCourses = {};
+let currentPage = 'jobs';
+let historyData = [];
+
+// ════════════════════════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  updateAuthUI();
+  loadJobs();
+  loadJobSyncStatus();
+  loadCourses();
+});
+
+// ════════════════════════════════════════════════════════════
+//  AUTH
+// ════════════════════════════════════════════════════════════
+function openAuth() { document.getElementById('authModal').classList.add('open'); }
+function closeAuth() { document.getElementById('authModal').classList.remove('open'); }
+
+function toggleAuthForm() {
+  const l = document.getElementById('loginForm');
+  const r = document.getElementById('registerForm');
+  l.style.display = l.style.display === 'none' ? '' : 'none';
+  r.style.display = r.style.display === 'none' ? '' : 'none';
+}
+
+async function doLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const err = document.getElementById('authError');
+  err.style.display = 'none';
+  try {
+    const res = await apiPost('/auth/login', { email, password }, false);
+    token = res.token;
+    currentUser = res;
+    localStorage.setItem('jl_token', token);
+    localStorage.setItem('jl_user', JSON.stringify(res));
+    closeAuth();
+    updateAuthUI();
+    toast('Logged in successfully! ', 'success');
+    loadJobs();
+  } catch(e) {
+    err.textContent = e.message || 'Invalid credentials';
+    err.style.display = 'block';
+  }
+}
+
+async function doRegister() {
+  const fullName = document.getElementById('regName').value.trim();
+  const email = document.getElementById('regEmail').value.trim();
+  const password = document.getElementById('regPassword').value;
+  const err = document.getElementById('authError2');
+  err.style.display = 'none';
+  try {
+    const res = await apiPost('/auth/register', { fullName, email, password }, false);
+    token = res.token;
+    currentUser = res;
+    localStorage.setItem('jl_token', token);
+    localStorage.setItem('jl_user', JSON.stringify(res));
+    closeAuth();
+    updateAuthUI();
+    toast('Account created! Welcome', 'success');
+    loadJobs();
+  } catch(e) {
+    err.textContent = e.message || 'Registration failed';
+    err.style.display = 'block';
+  }
+}
+
+function doLogout() {
+  token = null; currentUser = null;
+  localStorage.removeItem('jl_token');
+  localStorage.removeItem('jl_user');
+  updateAuthUI();
+  loadJobs();
+  toast('Logged out', 'success');
+}
+
+function updateAuthUI() {
+  const authBtn = document.getElementById('authBtn');
+  const logoutBtn = document.getElementById('logoutBtn');
+  const userName = document.getElementById('userName');
+  const userRoleLabel = document.getElementById('userRoleLabel');
+  const userAvatar = document.getElementById('userAvatar');
+
+  if (currentUser) {
+    authBtn.style.display = 'none';
+    logoutBtn.style.display = '';
+    userName.textContent = currentUser.fullName;
+    userRoleLabel.textContent = currentUser.email;
+    userAvatar.textContent = currentUser.fullName.charAt(0).toUpperCase();
+  } else {
+    authBtn.style.display = '';
+    logoutBtn.style.display = 'none';
+    userName.textContent = 'Guest User';
+    userRoleLabel.textContent = 'Not logged in';
+    userAvatar.textContent = '?';
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+//  PAGE NAV
+// ════════════════════════════════════════════════════════════
+const pageTitles = {
+  jobs: 'Job Opportunities',
+  courses: 'Free Courses',
+  resume: 'AI Resume Tailor',
+  saved: 'Saved Jobs',
+  history: 'Resume History'
+};
+
+function switchPage(page) {
+  document.querySelectorAll('.page-content').forEach(p => p.style.display = 'none');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + page).style.display = '';
+  document.getElementById('nav-' + page)?.classList.add('active');
+  document.getElementById('topbarTitle').textContent = pageTitles[page] || page;
+  currentPage = page;
+
+  // Live refresh every time the tab is clicked
+  if (page === 'jobs')    { loadJobs(); loadJobSyncStatus(); }
+  if (page === 'courses') loadCourses();   // re-fetch courses + sync status on every visit
+  if (page === 'saved')   loadSavedJobs();
+  if (page === 'history') loadHistory();
+}
+
+// ════════════════════════════════════════════════════════════
+//  JOBS — Live Refresh + Time Filtering
+// ════════════════════════════════════════════════════════════
+
+let activeTimeFilter = '';   // '' | '24H' | '7W'
+
+function setTimeFilter(btn, value) {
+  activeTimeFilter = value;
+  // Update pill UI
+  document.querySelectorAll('.time-pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  loadJobs();
+}
+
+async function loadJobSyncStatus() {
+  try {
+    const s = await apiGet('/jobs/sync/status');
+    const dot    = document.getElementById('jobSyncDot');
+    const text   = document.getElementById('jobSyncText');
+    const badge  = document.getElementById('jobSyncBadge');
+
+    dot.style.background  = 'var(--green)';
+    dot.style.boxShadow   = '0 0 8px var(--green)';
+    dot.style.animation   = 'pulse 1.5s infinite';
+    badge.style.display   = 'inline-block';
+    text.style.color      = 'var(--green)';
+
+    const platforms = s.platforms;
+    const parts = [];
+    if (platforms.remoteOk  > 0) parts.push(`<img src="https://remoteok.com/favicon.ico" style="width:13px;height:13px;border-radius:2px;vertical-align:middle;margin-right:2px"> RemoteOK: ${platforms.remoteOk}`);
+    if (platforms.ycJobs    > 0) parts.push(`<img src="https://news.ycombinator.com/favicon.ico" style="width:13px;height:13px;border-radius:2px;vertical-align:middle;margin-right:2px"> YC Jobs: ${platforms.ycJobs}`);
+    if (platforms.adzuna    > 0) parts.push(`<img src="https://www.adzuna.in/favicon.ico" style="width:13px;height:13px;border-radius:2px;vertical-align:middle;margin-right:2px"> Adzuna: ${platforms.adzuna}`);
+    if (platforms.unstop    > 0) parts.push(`<img src="https://unstop.com/favicon.ico" style="width:13px;height:13px;border-radius:2px;vertical-align:middle;margin-right:2px"> Unstop: ${platforms.unstop}`);
+    if (platforms.wellfound > 0) parts.push(`<img src="https://wellfound.com/favicon.ico" style="width:13px;height:13px;border-radius:2px;vertical-align:middle;margin-right:2px"> Wellfound: ${platforms.wellfound}`);
+
+    text.innerHTML = parts.length > 0
+      ? `Live jobs active — ${parts.join('  ·  ')}  ·  Last sync: ${s.lastSyncAt}`
+      : `${s.message}  ·  Last sync: ${s.lastSyncAt}`;
+
+    // Update stat cards with sync data
+    document.getElementById('stat-live').textContent    = s.liveJobs    || '—';
+    document.getElementById('stat-24h').textContent     = s.newJobsToday|| '—';
+  } catch(e) {
+    document.getElementById('jobSyncText').textContent = 'Live job sync active — syncs daily at 1:00 AM';
+  }
+}
+
+async function syncJobsNow() {
+  const btn = document.getElementById('jobSyncBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner" style="width:12px;height:12px;border-width:2px;display:inline-block"></span> Syncing…';
+  document.getElementById('jobSyncText').textContent = 'Fetching live jobs from all platforms…';
+  try {
+    const res = await fetch(API_BASE + '/jobs/sync', { method: 'POST',
+      headers: { ...(token ? { Authorization: 'Bearer ' + token } : {}) }
+    });
+    const data = await res.json();
+    document.getElementById('jobSyncText').textContent =
+      `Sync complete — ${data.added} new jobs added`;
+    await loadJobSyncStatus();
+    loadJobs();
+  } catch(e) {
+    document.getElementById('jobSyncText').textContent = 'Sync failed — check backend logs';
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = 'Sync Jobs Now';
+  }
+}
+
+async function loadJobs() {
+  const keyword     = document.getElementById('searchKeyword').value.trim() || 'java';
+  const location    = document.getElementById('searchLocation').value.trim();
+  const companyType = document.getElementById('filterCompany').value;
+  const jobType     = document.getElementById('filterType').value;
+  const sourceFilter= document.getElementById('filterSource').value;
+
+  const el = document.getElementById('jobsList');
+  el.innerHTML = skeletons(4);
+
+  document.getElementById('searchBtn').disabled = true;
+  document.getElementById('searchBtn').innerHTML =
+    '<span class="spinner" style="width:14px;height:14px;border-width:2px;display:inline-block"></span> Searching...';
+
+  document.getElementById('refreshBanner').style.display  = 'none';
+  document.getElementById('liveIndicator').style.display  = 'none';
+
+  const params = new URLSearchParams({ keyword });
+  if (location)     params.append('location',     location);
+  if (companyType)  params.append('companyType',  companyType);
+  if (jobType)      params.append('jobType',      jobType);
+  if (sourceFilter) params.append('sourceFilter', sourceFilter);
+  if (activeTimeFilter) params.append('timeFilter', activeTimeFilter);
+
+  try {
+    const result = await apiGet('/jobs/search?' + params.toString());
+    allJobs = result.jobs;
+    renderJobs(result.jobs);
+    updateJobStats(result);
+    showLiveBanner(result);
+  } catch(e) {
+    el.innerHTML = `<div class="empty-state"><div class="icon"></div>
+      <h3>Backend Offline</h3><p>Make sure Spring Boot is running on port 8080</p></div>`;
+  } finally {
+    document.getElementById('searchBtn').disabled = false;
+    document.getElementById('searchBtn').innerHTML = 'Search';
+  }
+}
+
+function showLiveBanner(result) {
+  const banner        = document.getElementById('refreshBanner');
+  const bannerText    = document.getElementById('refreshBannerText');
+  const bannerTime    = document.getElementById('refreshBannerTime');
+  const liveIndicator = document.getElementById('liveIndicator');
+
+  const timeStr = new Date(result.fetchedAt)
+    .toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+  const parts = [`${result.total} jobs`];
+  if (result.liveCount   > 0) parts.push(`${result.liveCount} live`);
+  if (result.newCount    > 0) parts.push(`${result.newCount} new today`);
+  if (result.remoteCount > 0) parts.push(`${result.remoteCount} remote`);
+  if (result.fresherCount> 0) parts.push(`${result.fresherCount} fresher`);
+
+  bannerText.textContent = parts.join('  ·  ');
+  bannerTime.textContent = 'Fetched at ' + timeStr;
+  banner.style.display   = 'flex';
+  liveIndicator.style.display = 'flex';
+}
+
+function renderJobs(jobs) {
+  const el = document.getElementById('jobsList');
+  const filterLabel = activeTimeFilter === '24H' ? 'last 24 hours' :
+                      activeTimeFilter === '7W'  ? 'last 7 weeks'  : 'all time';
+
+  const src  = document.getElementById('filterSource').value;
+  const liveC    = jobs.filter(j => j.live).length;
+  const remoteC  = jobs.filter(j => j.remote).length;
+  const fresherC = jobs.filter(j => j.fresher).length;
+  const newC     = jobs.filter(j => j.new).length;
+
+  document.getElementById('jobResultSub').textContent =
+    `${jobs.length} jobs · ${liveC} live · ${remoteC} remote · ${fresherC} fresher · ${newC} new`;
+  document.getElementById('jobCount').textContent = jobs.length;
+
+  if (!jobs.length) {
+    el.innerHTML = `<div class="empty-state"><div class="icon"></div><h3>No results</h3>
+      <p>No jobs found. Try broader filters or click "Sync Jobs Now" to fetch fresh listings.</p></div>`;
+    return;
+  }
+
+  el.innerHTML = jobs.map((job, i) => `
+    <div class="job-card" style="animation-delay:${i * 0.04}s${job.new ? ';border-color:rgba(16,185,129,0.4);box-shadow:0 0 0 1px rgba(16,185,129,0.15)' : ''}">
+      <div class="job-logo">${companyIcon(job.companyType)}</div>
+      <div class="job-body" style="flex:1;min-width:0">
+        <div class="job-header">
+          <div style="flex:1;min-width:0">
+            <div class="job-title">
+              ${job.new ? '<span style="background:rgba(16,185,129,0.2);color:var(--green);border-radius:4px;padding:1px 6px;font-size:10px;font-weight:700;margin-right:6px">NEW</span>' : ''}
+              ${job.title}
+            </div>
+            <div class="job-company">${job.company} &nbsp;·&nbsp; 📍 ${job.location}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+            ${job.salary ? `<div class="salary-badge">${job.salary}</div>` : ''}
+            <button class="save-btn ${job.saved ? 'saved' : ''}" onclick="toggleSave(${job.id}, this)">${job.saved ? '★' : '☆'}</button>
+          </div>
+        </div>
+        <div class="job-tags">
+          <span class="tag tag-${job.companyType.toLowerCase()}">${job.companyType}</span>
+          <span class="tag tag-${job.jobType.toLowerCase()}">${job.jobType === 'JOB' ? 'Full-Time' : 'Internship'}</span>
+          ${job.live    ? `<span class="tag" style="background:rgba(0,212,255,0.12);color:var(--accent);border:1px solid rgba(0,212,255,0.25)">${platformIcon(job.sourcePlatform)} ${platformLabel(job.sourcePlatform)}</span>` : '<span class="tag tag-skill">Curated</span>'}
+          ${job.remote  ? '<span class="tag" style="background:rgba(124,58,237,0.15);color:#a78bfa;border:1px solid rgba(124,58,237,0.3)">🏠 Remote</span>' : ''}
+          ${job.fresher ? '<span class="tag" style="background:rgba(245,158,11,0.12);color:var(--accent3);border:1px solid rgba(245,158,11,0.25)">🎓 Fresher</span>' : ''}
+          ${job.experience ? `<span class="tag tag-skill">${job.experience}</span>` : ''}
+          <span class="${timeAgoCssClass(job.postedTimeAgo)} time-ago-badge">${job.postedTimeAgo || 'Just now'}</span>
+        </div>
+        ${job.skills ? `<div class="job-tags">${job.skills.split(',').slice(0,5).map(s => `<span class="tag tag-skill">${s.trim()}</span>`).join('')}</div>` : ''}
+        ${job.requirements ? `<div class="job-meta" style="margin-bottom:12px"><span>${job.requirements.substring(0,100)}${job.requirements.length > 100 ? '…' : ''}</span></div>` : ''}
+        <div class="job-actions">
+          <a href="${job.applyLink}" target="_blank" class="btn btn-primary btn-sm">Apply Now →</a>
+          <span style="font-size:11px;color:var(--muted)">${platformIcon(job.sourcePlatform)} ${platformLabel(job.sourcePlatform)}</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function platformIcon(p) {
+  const icons = {
+    REMOTEOK:    '<img src="https://remoteok.com/favicon.ico" style="width:14px;height:14px;border-radius:3px;vertical-align:middle;margin-right:3px" onerror="this.style.display=\'none\'">',
+    YC_JOBS:     '<img src="https://news.ycombinator.com/favicon.ico" style="width:14px;height:14px;border-radius:3px;vertical-align:middle;margin-right:3px" onerror="this.style.display=\'none\'">',
+    ADZUNA:      '<img src="https://www.adzuna.in/favicon.ico" style="width:14px;height:14px;border-radius:3px;vertical-align:middle;margin-right:3px" onerror="this.style.display=\'none\'">',
+    UNSTOP:      '<img src="https://unstop.com/favicon.ico" style="width:14px;height:14px;border-radius:3px;vertical-align:middle;margin-right:3px" onerror="this.style.display=\'none\'">',
+    INTERNSHALA: '<img src="https://internshala.com/favicon.ico" style="width:14px;height:14px;border-radius:3px;vertical-align:middle;margin-right:3px" onerror="this.style.display=\'none\'">',
+    WELLFOUND:   '<img src="https://wellfound.com/favicon.ico" style="width:14px;height:14px;border-radius:3px;vertical-align:middle;margin-right:3px" onerror="this.style.display=\'none\'">',
+    MANUAL:      ''
+  };
+  return icons[p] || '';
+}
+
+function platformLabel(p) {
+  const labels = {
+    REMOTEOK: 'RemoteOK', YC_JOBS: 'YC Jobs', ADZUNA: 'Adzuna',
+    UNSTOP: 'Unstop', INTERNSHALA: 'Internshala', WELLFOUND: 'Wellfound', MANUAL: 'Curated'
+  };
+  return labels[p] || p;
+}
+
+function timeAgoCssClass(timeAgo) {
+  if (!timeAgo) return 'time-ago-fresh';
+  const t = timeAgo.toLowerCase();
+  if (t.includes('just') || t.includes('min') || t.includes('hour')) return 'time-ago-fresh';
+  if (t.includes('day') || t.includes('week')) return 'time-ago-recent';
+  return 'time-ago-old';
+}
+
+function updateJobStats(result) {
+  document.getElementById('stat-total').textContent   = result.total;
+  document.getElementById('stat-live').textContent    = result.liveCount    ?? '—';
+  document.getElementById('stat-24h').textContent     = result.newCount     ?? result.last24hCount ?? '—';
+  document.getElementById('stat-fresher').textContent = result.fresherCount ?? '—';
+  document.getElementById('stat-remote-sub').textContent =
+    `${result.remoteCount ?? 0} remote jobs`;
+  const label = activeTimeFilter === '24H' ? 'Last 24 hours' :
+                activeTimeFilter === '7W'  ? 'Last 7 weeks'  : 'All sources';
+  document.getElementById('stat-total-sub').textContent = label;
+}
+
+function resetFilters() {
+  document.getElementById('searchKeyword').value = 'java';
+  document.getElementById('searchLocation').value = '';
+  document.getElementById('filterCompany').value = '';
+  document.getElementById('filterType').value = '';
+  document.getElementById('filterSource').value = '';
+  activeTimeFilter = '';
+  document.querySelectorAll('.time-pill').forEach(p => p.classList.remove('active'));
+  document.getElementById('tpAll').classList.add('active');
+  loadJobs();
+}
+
+async function toggleSave(jobId, btn) {
+  if (!token) { openAuth(); return; }
+  try {
+    const res = await apiPost('/jobs/save/' + jobId);
+    const saved = res.message.includes('saved successfully');
+    btn.textContent = saved ? '★' : '☆';
+    btn.classList.toggle('saved', saved);
+    toast(res.message, 'success');
+  } catch(e) {
+    toast('Could not save job', 'error');
+  }
+}
+
+async function loadSavedJobs() {
+  if (!token) {
+    document.getElementById('savedJobsList').innerHTML = `<div class="empty-state"><div class="icon"></div><h3>Sign in required</h3><p>Please sign in to view saved jobs</p><br><button class="btn btn-primary" onclick="openAuth()">Sign In</button></div>`;
+    return;
+  }
+  document.getElementById('savedJobsList').innerHTML = skeletons(2);
+  try {
+    const jobs = await apiGet('/jobs/saved');
+    document.getElementById('savedJobsList').innerHTML = '';
+    if (!jobs.length) {
+      document.getElementById('savedJobsList').innerHTML = `<div class="empty-state"><div class="icon"></div><h3>No saved jobs</h3><p>Click ☆ on any job to save it</p></div>`;
+      return;
+    }
+    renderJobsTo(jobs, 'savedJobsList');
+  } catch(e) {
+    toast('Failed to load saved jobs', 'error');
+  }
+}
+
+function renderJobsTo(jobs, containerId) {
+  document.getElementById(containerId).innerHTML = jobs.map((job, i) => `
+    <div class="job-card" style="animation-delay:${i * 0.04}s">
+      <div class="job-logo">${companyIcon(job.companyType)}</div>
+      <div class="job-body">
+        <div class="job-title">${job.title}</div>
+        <div class="job-company">${job.company} &nbsp;·&nbsp; 📍 ${job.location}</div>
+        <div class="job-tags" style="margin-top:8px">
+          <span class="tag tag-${job.companyType.toLowerCase()}">${job.companyType}</span>
+          <span class="tag tag-${job.jobType.toLowerCase()}">${job.jobType}</span>
+        </div>
+        ${job.salary ? `<div class="salary-badge" style="margin-top:8px;display:inline-block">${job.salary}</div>` : ''}
+      </div>
+      <div class="job-actions">
+        <a href="${job.applyLink}" target="_blank" class="btn btn-primary btn-sm">Apply →</a>
+        <button class="save-btn saved" onclick="toggleSave(${job.id}, this)">★</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ════════════════════════════════════════════════════════════
+//  COURSES
+// ════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════
+//  COURSES — Live Sync + YouTube Auto-fetch
+// ════════════════════════════════════════════════════════════
+
+async function loadCourses() {
+  try {
+    allCourses = await apiGet('/courses/grouped');
+    renderCourses(allCourses);
+    updateCourseStats(allCourses);
+    await loadSyncStatus();  // load sync banner after courses render
+  } catch(e) {
+    document.getElementById('coursesContainer').innerHTML =
+      `<div class="empty-state"><div class="icon"></div><h3>Backend Offline</h3><p>Start your Spring Boot server</p></div>`;
+  }
+}
+
+async function loadSyncStatus() {
+  try {
+    const s = await apiGet('/courses/sync/status');
+    const dot  = document.getElementById('syncDot');
+    const text = document.getElementById('syncStatusText');
+    const time = document.getElementById('syncLastTime');
+    const badge = document.getElementById('syncCountBadge');
+    const liveInd = document.getElementById('courseLiveIndicator');
+
+    // No API key needed — scraping is always available
+    dot.style.background = 'var(--green)';
+    dot.style.boxShadow  = '0 0 8px var(--green)';
+    dot.style.animation  = 'pulse 1.5s infinite';
+    text.style.color     = 'var(--green)';
+    text.textContent     = s.message;
+    liveInd.style.display = 'flex';
+
+    if (s.lastSyncAt && s.lastSyncAt !== 'Never') {
+      time.textContent = 'Last sync: ' + s.lastSyncAt;
+    }
+    if (s.lastSyncAdded > 0) {
+      badge.style.display = 'inline-block';
+      badge.textContent   = '+' + s.lastSyncAdded + ' new';
+    }
+
+    document.getElementById('stat-courses-total').textContent = s.totalCourses || '—';
+    document.getElementById('stat-courses-auto').textContent  = s.autoFetchedCourses || 0;
+    document.getElementById('courseCount').textContent = s.totalCourses || '—';
+  } catch(e) {
+    // sync status is optional — don't break the page
+  }
+}
+
+async function syncNow() {
+  const btn = document.getElementById('syncNowBtn');
+  const text = document.getElementById('syncStatusText');
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner" style="width:12px;height:12px;border-width:2px;display:inline-block"></span> Syncing...';
+  text.textContent = 'Fetching new courses from YouTube...';
+
+  try {
+    const result = await fetch(`${API}/courses/sync`, { method: 'POST',
+      headers: token ? { 'Authorization': 'Bearer ' + token } : {} });
+    const data = await result.json();
+
+    if (data.success) {
+      toast(`Sync complete! ${data.newCoursesAdded} new courses added.`, 'success');
+      // Reload courses to show newly added ones
+      await loadCourses();
+    } else {
+      toast('Sync failed: ' + (data.error || 'Unknown error'), 'error');
+      text.textContent = 'Sync failed — check YouTube API key';
+    }
+  } catch(e) {
+    toast('Sync failed — backend may be offline', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = 'Sync Now';
+  }
+}
+
+function updateCourseStats(grouped) {
+  const allFlat = Object.values(grouped).flat();
+  const autoCount = allFlat.filter(c => c.isAutoFetched || c.sourceType === 'YOUTUBE').length;
+  const newCount  = allFlat.filter(c => c.isNew).length;
+  document.getElementById('stat-courses-total').textContent = allFlat.length;
+  document.getElementById('stat-courses-auto').textContent  = autoCount;
+  document.getElementById('stat-courses-new').textContent   = newCount;
+  document.getElementById('courseCount').textContent        = allFlat.length;
+  document.getElementById('courseResultSub').innerHTML    =
+    `${allFlat.length} courses · <img src="https://www.youtube.com/favicon.ico" style="width:12px;height:12px;vertical-align:middle;border-radius:2px"> ${allFlat.filter(c=>c.sourceType==='YOUTUBE').length} YouTube · <img src="https://www.udemy.com/favicon.ico" style="width:12px;height:12px;vertical-align:middle;border-radius:2px"> ${allFlat.filter(c=>c.sourceType==='UDEMY').length} Udemy · <img src="https://github.com/favicon.ico" style="width:12px;height:12px;vertical-align:middle;border-radius:2px;filter:invert(1)"> ${allFlat.filter(c=>c.sourceType==='GITHUB').length} GitHub · ✨ ${newCount} new`;
+}
+
+const techIcons = {
+  'Core Java': '', 'Advanced Java': '', 'Spring Boot': '',
+  'Spring AI': '', 'SQL': '', 'Git & GitHub': '',
+  'AWS': '', 'DSA': '', 'Microservices': ''
+};
+
+function renderCourses(grouped) {
+  const container = document.getElementById('coursesContainer');
+  if (!Object.keys(grouped).length) {
+    container.innerHTML = `<div class="empty-state"><div class="icon"></div><h3>No courses found</h3><p>Try a different filter or click Sync Now to fetch from YouTube</p></div>`;
+    return;
+  }
+
+  container.innerHTML = Object.entries(grouped).map(([tech, courses]) => `
+    <div class="tech-section">
+      <div class="tech-header">
+        <span class="tech-icon">${techIcons[tech] || ''}</span>
+        <span class="tech-name">${tech}</span>
+        <span class="tech-count">${courses.length} courses</span>
+        ${courses.some(c => c.isNew) ? `<span style="margin-left:8px;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;background:rgba(16,185,129,0.15);color:var(--green);border:1px solid rgba(16,185,129,0.3)">NEW</span>` : ''}
+      </div>
+      <div class="courses-grid">
+        ${courses.map((c, i) => `
+          <div class="course-card ${c.isNew ? 'course-new' : ''}" style="animation-delay:${i*0.05}s">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+              <div class="course-platform ${platformClass(c.platform)}">${sourceBadge(c)}</div>
+              ${c.isNew ? `<span style="padding:2px 7px;border-radius:8px;font-size:10px;font-weight:700;background:rgba(16,185,129,0.15);color:var(--green);border:1px solid rgba(16,185,129,0.25)">NEW</span>` : ''}
+              ${c.isAutoFetched && !c.isNew ? `<span style="padding:2px 7px;border-radius:8px;font-size:10px;font-weight:600;background:rgba(0,212,255,0.08);color:var(--accent);border:1px solid rgba(0,212,255,0.2)">YT</span>` : ''}
+            </div>
+            ${c.thumbnailUrl ? `<img src="${c.thumbnailUrl}" alt="" style="width:100%;border-radius:8px;margin-bottom:10px;object-fit:cover;height:120px;background:var(--surface2)" loading="lazy" onerror="this.style.display='none'">` : ''}
+            <div class="course-title">${c.title}</div>
+            <div class="course-instructor">${c.instructor || 'Various'}</div>
+            <div class="course-meta">
+              ${c.level ? `<span class="course-tag ${c.level.toLowerCase()}">${c.level}</span>` : ''}
+              ${c.duration ? `<span class="course-tag duration">⏱ ${c.duration}</span>` : ''}
+              ${c.addedTimeAgo ? `<span class="course-tag" style="color:var(--muted);font-size:10px">${c.addedTimeAgo}</span>` : ''}
+            </div>
+            <a href="${c.courseLink}" target="_blank" class="btn btn-outline btn-sm" style="justify-content:center;margin-top:auto">
+              Open Free Course
+            </a>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterCoursesUI() {
+  const query  = document.getElementById('courseSearch').value.toLowerCase();
+  const cat    = document.getElementById('courseCategory').value.toLowerCase();
+  const source = document.getElementById('courseSource')?.value || '';
+
+  const filtered = {};
+  for (const [tech, courses] of Object.entries(allCourses)) {
+    const fc = courses.filter(c => {
+      const matchQuery  = !query  || c.title.toLowerCase().includes(query) ||
+                          c.technology.toLowerCase().includes(query) ||
+                          c.platform.toLowerCase().includes(query);
+      const matchCat    = !cat    || c.technology.toLowerCase().includes(cat);
+      const matchSource = !source ||
+        (source === 'youtube' && c.sourceType === 'YOUTUBE') ||
+        (source === 'udemy'   && c.sourceType === 'UDEMY') ||
+        (source === 'github'  && c.sourceType === 'GITHUB') ||
+        (source === 'manual'  && !c.isAutoFetched) ||
+        (source === 'new'     && c.isNew);
+      return matchQuery && matchCat && matchSource;
+    });
+    if (fc.length) filtered[tech] = fc;
+  }
+  renderCourses(filtered);
+}
+
+// ════════════════════════════════════════════════════════════
+//  RESUME TAILOR
+// ════════════════════════════════════════════════════════════
+async function tailorResume() {
+  const resumeText = document.getElementById('resumeInput').value.trim();
+  const jobDescription = document.getElementById('jdInput').value.trim();
+  const jobTitle = document.getElementById('jdTitle').value.trim();
+  const companyName = document.getElementById('jdCompany').value.trim();
+
+  if (!resumeText) { toast('Please paste your resume', 'error'); return; }
+  if (!jobDescription) { toast('Please paste the job description', 'error'); return; }
+  if (!jobTitle) { toast('Please enter the job title', 'error'); return; }
+  if (!companyName) { toast('Please enter the company name', 'error'); return; }
+
+  const resultEl = document.getElementById('resumeResult');
+  const tipsEl = document.getElementById('tipsResult');
+
+  resultEl.innerHTML = `<div class="ai-loader"><div class="spinner"></div><span>AI is tailoring your resume...</span></div>`;
+  tipsEl.style.display = 'none';
+  document.getElementById('copyResultBtn').style.display = 'none';
+
+  try {
+    const res = await apiPost('/resume/tailor', { resumeText, jobDescription, jobTitle, companyName });
+    resultEl.innerHTML = `<div class="ai-result">${escapeHtml(res.tailoredResume)}</div>`;
+    if (res.tips) {
+      tipsEl.style.display = '';
+      tipsEl.innerHTML = `<div class="tips-box"><strong>Why this works:</strong>\n\n${escapeHtml(res.tips)}</div>`;
+    }
+    document.getElementById('copyResultBtn').style.display = '';
+    toast('Resume tailored successfully!', 'success');
+  } catch(e) {
+    resultEl.innerHTML = `<div class="empty-state"><div class="icon"></div><h3>Error</h3><p>${e.message}</p></div>`;
+    toast('Failed: ' + e.message, 'error');
+  }
+}
+
+function copyResult() {
+  const text = document.querySelector('#resumeResult .ai-result')?.textContent || '';
+  navigator.clipboard.writeText(text).then(() => toast('Copied to clipboard!', 'success'));
+}
+
+async function saveBaseResume() {
+  if (!token) { openAuth(); return; }
+  const resumeText = document.getElementById('resumeInput').value.trim();
+  if (!resumeText) { toast('No resume to save', 'error'); return; }
+  try {
+    await apiPost('/resume/save', { resumeText });
+    toast('Resume saved!', 'success');
+  } catch(e) {
+    toast('Failed to save', 'error');
+  }
+}
+
+async function loadSavedResume() {
+  if (!token) { openAuth(); return; }
+  try {
+    const res = await apiGet('/resume/base');
+    if (res.resumeText) {
+      document.getElementById('resumeInput').value = res.resumeText;
+      toast('Resume loaded!', 'success');
+    } else {
+      toast('No saved resume found', 'error');
+    }
+  } catch(e) {
+    toast('Failed to load', 'error');
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+//  HISTORY
+// ════════════════════════════════════════════════════════════
+async function loadHistory() {
+  if (!token) {
+    document.getElementById('historyList').innerHTML = `<div class="empty-state"><div class="icon"></div><h3>Sign in required</h3><br><button class="btn btn-primary" onclick="openAuth()">Sign In</button></div>`;
+    return;
+  }
+  document.getElementById('historyList').innerHTML = '<div class="empty-state"><div class="spinner" style="margin:0 auto"></div></div>';
+  try {
+    historyData = await apiGet('/resume/history');
+    if (!historyData.length) {
+      document.getElementById('historyList').innerHTML = `<div class="empty-state"><div class="icon"></div><h3>No history yet</h3><p>Tailor a resume to see it here</p></div>`;
+      return;
+    }
+    document.getElementById('historyList').innerHTML = historyData.map((h, i) => `
+      <div class="history-item" onclick="showHistoryDetail(${i})">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div class="history-job">${h.jobTitle} at ${h.companyName}</div>
+            <div class="history-date">${new Date(h.createdAt).toLocaleString()}</div>
+          </div>
+          <button class="btn btn-outline btn-sm">View →</button>
+        </div>
+      </div>
+    `).join('');
+  } catch(e) {
+    toast('Failed to load history', 'error');
+  }
+}
+
+function showHistoryDetail(idx) {
+  const h = historyData[idx];
+  document.getElementById('historyDetailTitle').textContent = `${h.jobTitle} — ${h.companyName}`;
+  document.getElementById('historyDetailContent').textContent = h.tailoredResume;
+  document.getElementById('historyDetail').style.display = '';
+  document.getElementById('historyDetail').scrollIntoView({ behavior: 'smooth' });
+}
+
+function hideHistoryDetail() { document.getElementById('historyDetail').style.display = 'none'; }
+
+function copyHistoryResult() {
+  const text = document.getElementById('historyDetailContent').textContent;
+  navigator.clipboard.writeText(text).then(() => toast('Copied!', 'success'));
+}
+
+// ════════════════════════════════════════════════════════════
+//  API HELPERS
+// ════════════════════════════════════════════════════════════
+async function apiGet(path) {
+  const headers = { 'Content-Type': 'application/json' };
+  if (token) headers['Authorization'] = 'Bearer ' + token;
+  const res = await fetch(API + path, { headers });
+  if (!res.ok) { const err = await res.json().catch(() => ({})); throw new Error(err.message || 'Request failed'); }
+  return res.json();
+}
+
+async function apiPost(path, body = {}, useToken = true) {
+  const headers = { 'Content-Type': 'application/json' };
+  if (token && useToken) headers['Authorization'] = 'Bearer ' + token;
+  const res = await fetch(API + path, { method: 'POST', headers, body: JSON.stringify(body) });
+  if (!res.ok) { const err = await res.json().catch(() => ({})); throw new Error(err.message || 'Request failed'); }
+  return res.json();
+}
+
+// ════════════════════════════════════════════════════════════
+//  UTILITIES
+// ════════════════════════════════════════════════════════════
+function toast(msg, type = 'success') {
+  const c = document.getElementById('toastContainer');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = msg;
+  c.appendChild(t);
+  setTimeout(() => t.remove(), 3500);
+}
+
+function companyIcon(type) {
+  return '';
+}
+
+
+function sourceBadge(c) {
+  const icons = {
+    YOUTUBE: '<img src="https://www.youtube.com/favicon.ico" style="width:14px;height:14px;border-radius:3px;vertical-align:middle;margin-right:3px" onerror="this.style.display=\'none\'">',
+    UDEMY:   '<img src="https://www.udemy.com/favicon.ico" style="width:14px;height:14px;border-radius:3px;vertical-align:middle;margin-right:3px" onerror="this.style.display=\'none\'">',
+    GITHUB:  '<svg style=\"width:14px;height:14px;vertical-align:middle;margin-right:3px;fill:#e2e8f0\" viewBox=\"0 0 16 16\"><path d=\"M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z\"/></svg>'
+  };
+  const icon = icons[c.sourceType] || '';
+  return icon + (c.platform || 'Unknown');
+}
+
+function platformClass(platform) {
+  if (platform.toLowerCase().includes('udemy')) return 'platform-udemy';
+  if (platform.toLowerCase().includes('nptel') || platform.toLowerCase().includes('spring') || platform.toLowerCase().includes('aws') || platform.toLowerCase().includes('github')) return 'platform-official';
+  return 'platform-other';
+}
+
+function skeletons(n) {
+  return Array(n).fill('<div class="skeleton skeleton-card" style="margin-bottom:14px"></div>').join('');
+}
+
+function escapeHtml(str) {
+  return str?.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') || '';
+}
+
+// Enter key to search jobs
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && currentPage === 'jobs') loadJobs();
+});
+</script>
+</body>
+</html>

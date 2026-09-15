@@ -1385,7 +1385,7 @@ async function syncJobsNow() {
   btn.innerHTML = '<span class="spinner" style="width:12px;height:12px;border-width:2px;display:inline-block"></span> Syncing…';
   document.getElementById('jobSyncText').textContent = 'Fetching live jobs from all platforms…';
   try {
-    const res = await fetch(API + '/jobs/sync', ', { method: 'POST',
+    const res = await fetch(API + '/jobs/sync', { method: 'POST',
       headers: { ...(token ? { Authorization: 'Bearer ' + token } : {}) }
     });
     const data = await res.json();

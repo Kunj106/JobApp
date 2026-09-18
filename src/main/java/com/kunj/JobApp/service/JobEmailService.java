@@ -50,7 +50,7 @@ public class JobEmailService
         log.info("📧 Preparing daily job digest for {}...", recipientEmail);
 
         // Fetch jobs from last 24 hours matching the configured location
-        LocalDateTime since   = LocalDateTime.now().minusDays(7);
+        LocalDateTime since   = LocalDateTime.now().minusHours(24);
         String        locLower = digestLocation.toLowerCase();
 
         List<Job> recentJobs = jobRepository
